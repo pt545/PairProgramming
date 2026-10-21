@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class CardGame{
     
@@ -33,12 +34,13 @@ public class CardGame{
 
 
         int[][] hands = cards.DealDecks();
+        AtomicInteger wincond = new AtomicInteger(0);
         // dimensions 4 x nPlayers
         //now initialise the players
         players = new Player[nPlayers];
         for(int i = 0; i < nPlayers;i++){
             int RightIndex = (i-1 > -1) ? i-1 : nPlayers - 1;
-            players[i] = new Player(cards,hands[i],i,i,RightIndex);
+            players[i] = new Player(cards,hands[i],i,i,RightIndex, wincond);
             System.out.println(i + " " + i +" "+RightIndex);
         }
 
@@ -49,17 +51,7 @@ public class CardGame{
         for(int i = 0; i < nPlayers;i++){
             threads[i].start();
         }
-
-
-        
-
-
-
-
-
-        //start the threads of each player
-
-        
+    
+        //start the threads of each player   
     }
-
 }
