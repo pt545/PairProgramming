@@ -1,131 +1,96 @@
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * A thread-safe FIFO deck of cards.
+ * CardDeck
  *
- * <p>Cards are drawn from the top (front) and discarded to the bottom (back).
- * Every public method takes the deck's lock, so single operations are always
- * atomic. Because a player's "draw then discard" must be one atomic action
- * spanning two decks, the lock is exposed through {@link #lockPair} and
- * {@link #unlockPair}, which always acquire locks in ascending deck-id order
- * so that players around the ring can never deadlock on each other.
+ * A deck of cards that sits between two players. Players take a card from the
+ * TOP of the deck and put a card on the BOTTOM of the deck (like a queue: the
+ * first card in is the first card out).
+ *
+ * Several player threads use the same deck at once, so every method is
+ * "synchronized". That means only one thread at a time can be running any of
+ * the deck's methods, which stops two players taking the same card or
+ * corrupting the list.
  */
 public class CardDeck {
 
-    private final int id;
-    private final Deque<Card> cards = new ArrayDeque<>();
-    private final ReentrantLock lock = new ReentrantLock();
+    private final int id;                                  // deck number: 1, 2, 3...
+    private final LinkedList<Card> cards = new LinkedList<>(); // front of the list = top of the deck
 
     /**
-     * @param id the deck number (1..n)
-     * @throws IllegalArgumentException if {@code id} is less than 1
+     * @param id the deck number, starting from 1
      */
     public CardDeck(int id) {
         if (id < 1) {
-            throw new IllegalArgumentException("Deck id must be at least 1: " + id);
+            throw new IllegalArgumentException("Deck number must be at least 1: " + id);
         }
         this.id = id;
     }
 
-    /** @return the deck number */
+    /**
+     * @return the deck number
+     */
     public int getId() {
         return id;
     }
 
     /**
-     * Adds a card to the bottom (back) of the deck.
+     * Puts a card on the bottom of the deck.
      *
-     * @param card the card to add; must not be null
+     * @param card the card to add (must not be null)
      */
-    public void addToBottom(Card card) {
+    public synchronized void addToBottom(Card card) {
         if (card == null) {
-            throw new IllegalArgumentException("card must not be null");
+            throw new IllegalArgumentException("Card must not be null");
         }
-        lock.lock();
-        try {
-            cards.addLast(card);
-        } finally {
-            lock.unlock();
-        }
+        cards.addLast(card);
     }
 
     /**
-     * Removes and returns the card at the top (front) of the deck.
+     * Takes the card from the top of the deck.
      *
-     * @return the top card, or {@code null} if the deck is empty
+     * @return the top card, or null if the deck is empty
      */
-    public Card drawFromTop() {
-        lock.lock();
-        try {
-            return cards.pollFirst();
-        } finally {
-            lock.unlock();
+    public synchronized Card drawFromTop() {
+        if (cards.isEmpty()) {
+            return null;
         }
-    }
-
-    /** @return the number of cards currently in the deck */
-    public int size() {
-        lock.lock();
-        try {
-            return cards.size();
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /** @return true if the deck holds no cards */
-    public boolean isEmpty() {
-        return size() == 0;
-    }
-
-    /** @return a snapshot of the deck contents, top card first */
-    public List<Card> snapshot() {
-        lock.lock();
-        try {
-            return new ArrayList<>(cards);
-        } finally {
-            lock.unlock();
-        }
+        return cards.removeFirst();
     }
 
     /**
-     * @return the contents line used in the deck output file,
-     *         e.g. {@code "deck2 contents: 1 3 3 7"}
+     * @return how many cards are in the deck right now
      */
-    public String contentsLine() {
-        StringBuilder sb = new StringBuilder("deck").append(id).append(" contents:");
-        for (Card c : snapshot()) {
-            sb.append(' ').append(c.getValue());
-        }
-        return sb.toString();
+    public synchronized int size() {
+        return cards.size();
     }
 
     /**
-     * Locks two decks in a globally consistent order (ascending id). If both
-     * arguments are the same deck (a one-player game) it is locked once.
+     * @return true if there are no cards in the deck
      */
-    public static void lockPair(CardDeck a, CardDeck b) {
-        if (a == b) {
-            a.lock.lock();
-            return;
-        }
-        CardDeck first = a.id <= b.id ? a : b;
-        CardDeck second = first == a ? b : a;
-        first.lock.lock();
-        second.lock.lock();
+    public synchronized boolean isEmpty() {
+        return cards.isEmpty();
     }
 
-    /** Releases locks taken with {@link #lockPair}. */
-    public static void unlockPair(CardDeck a, CardDeck b) {
-        if (a == b) {
-            a.lock.unlock();
-            return;
+    /**
+     * @return a COPY of the cards, top card first. It is a copy so that other
+     *         classes cannot change the real deck by accident.
+     */
+    public synchronized List<Card> getCards() {
+        return new ArrayList<>(cards);
+    }
+
+    /**
+     * @return the line written to deckX_output.txt at the end of the game,
+     *         for example "deck2 contents: 1 3 3 7"
+     */
+    public synchronized String contentsLine() {
+        String line = "deck" + id + " contents:";
+        for (Card card : cards) {
+            line = line + " " + card.getValue();
         }
-        b.lock.unlock();
-        a.lock.unlock();
+        return line;
     }
 }

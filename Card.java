@@ -1,7 +1,7 @@
 /**
--Represent each card 
--Stores the card denomination
--Provides the other classes to read that denomination.
+*Represent each card 
+*Stores the card denomination
+*Provides the other classes to read that denomination.
  */
 public final class Card {
 

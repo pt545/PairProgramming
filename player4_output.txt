@@ -1,0 +1,7 @@
+player 4 initial hand 4 3 2 3
+player 4 draws a 1 from deck 4
+player 4 discards a 3 to deck 1
+player 4 current hand is 4 2 3 1
+player 1 has informed player 4 that player 1 has won
+player 4 exits
+player 4 hand: 4 2 3 1
