@@ -33,7 +33,7 @@ public class Player implements  Runnable{
             }
         }
         System.out.println("Player" + (playerid + 1) + " wins" + Arrays.toString(hand));
-        win = wincond.compareAndSet(0, playerid);
+        win = wincond.compareAndSet(-1, playerid);
         // then tell other threads 
 
     }
@@ -46,7 +46,7 @@ public class Player implements  Runnable{
         try{
         
         int counter = 0;
-            while (wincond.intValue() == 0) {
+            while (wincond.intValue() == -1) {
                 counter++;
                 int index = 0;
                 for(int i = 0; i < 4; i++){
