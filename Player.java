@@ -98,13 +98,13 @@ public class Player implements  Runnable{
                 //System.out.println("Choose loop " +playerid + " " + randInd + " " + hand[randInd].getValue());
             }while (hand[randInd].getValue() == playerid);
 
-            actionslog += "Player " + playerid + " has added " + hand[randInd].getValue() + " to its hand " + getHand();
-
             //System.out.println("add to bottom");
             RightDeck.addToBottom(hand[randInd]);
 
             //System.out.println("Draw from top");
             hand[randInd] = LeftDeck.drawFromTop();
+
+            actionslog += "Player " + playerid + " has added " + hand[randInd].getValue() + " to its hand " + getHand();
 
             addToLog(actionslog);
             System.out.println(actionslog);
