@@ -1,9 +1,6 @@
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.Random;
-import java.util.Scanner;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -13,25 +10,22 @@ public class Player implements  Runnable{
     private int playerid; //doubles as prefered value
     private CardDeck LeftDeck;
     private CardDeck RightDeck;
-    private CountDownLatch Gate;
     private String Folder;
     private Card[] hand;
     private int endIndex;
     private String log;
 
 
-    public Player(int playerid,CardDeck LeftDeck, CardDeck RightDeck, AtomicInteger initialcond,CountDownLatch startGate,String folder){
+    public Player(int playerid,CardDeck LeftDeck, CardDeck RightDeck, AtomicInteger initialcond,String folder){
         
-        this.playerid = playerid;
-        this.wincond = initialcond;
-        this.LeftDeck = LeftDeck;
-        this.RightDeck = RightDeck;
-        Gate = startGate;
-        Folder = folder;
-        hand = new Card[4];
+        this.playerid = playerid; // player identifier
+        this.wincond = initialcond; // doubles as a stop condition and identifies who wins
+        this.LeftDeck = LeftDeck; // draw from this deck
+        this.RightDeck = RightDeck; // discard to this deck
+        Folder = folder; // where to write the output log files
+        hand = new Card[4]; //hard set as hand size must always equal 4.
         endIndex = 0;
         log = "";
-        //System.out.println("Initialised");
     }
 
 
@@ -45,7 +39,7 @@ public class Player implements  Runnable{
     }
 
 
-    public synchronized void Win(){
+    private synchronized void Win(){
         wincond.set(playerid);
     }
 
@@ -83,28 +77,26 @@ public class Player implements  Runnable{
         while(wincond.intValue() == 0){
             
             String actionslog = "";
-            //check win 
-            //System.out.println(getHand());
-            if(checkWin()){
-                //System.out.println("checkwin");
-                wincond.set(playerid);
+            if(checkWin() && wincond.intValue() == 0){
+                Win();
                 continue;
             }
             //draw and discard
             //get a random value that is not equal to the prefered value (playerid)
-            // System.out.println("aaaaaa");
             do{
                 randInd = r.nextInt(4);
-                //System.out.println("Choose loop " +playerid + " " + randInd + " " + hand[randInd].getValue());
+                
             }while (hand[randInd].getValue() == playerid);
 
-            //System.out.println("add to bottom");
-            RightDeck.addToBottom(hand[randInd]);
+            if (!LeftDeck.isEmpty()) {
+                RightDeck.addToBottom(hand[randInd]);
+                hand[randInd] = LeftDeck.drawFromTop();
 
-            //System.out.println("Draw from top");
-            hand[randInd] = LeftDeck.drawFromTop();
+                actionslog += "Player " + playerid + " has added " + hand[randInd].getValue() + " to its hand " + getHand();
 
-            actionslog += "Player " + playerid + " has added " + hand[randInd].getValue() + " to its hand " + getHand();
+            }else{
+                actionslog += "Unable do draw a card due to deck not containing any cards";
+            }
 
             addToLog(actionslog);
             System.out.println(actionslog);
@@ -115,7 +107,7 @@ public class Player implements  Runnable{
             winlog = "Player " + playerid + " wins ";
             winlog += "with the hand " + getHand();
         }else{
-            winlog = "Player " + wincond.intValue() + " has informed " + playerid + " that player " + playerid + " has won";
+            winlog = "Player " + wincond.intValue() + " has informed " + playerid + " that player " + wincond.intValue() + " has won";
         }
         addToLog(winlog);
         System.out.println(winlog);

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -135,7 +134,6 @@ public class CardGame {
 
         // Shared by every player (see Player for what they are used for).
         AtomicInteger winner = new AtomicInteger(0);
-        CountDownLatch startGate = new CountDownLatch(n);
 
         // Create the decks (numbered 1 to n).
         List<CardDeck> decks = new ArrayList<>();
@@ -147,7 +145,7 @@ public class CardGame {
         // decks.get(i - 1) is deck i, and decks.get(i % n) is deck i+1 (or deck 1 for the last player).
         List<Player> players = new ArrayList<>();
         for (int i = 1; i <= n; i++) {
-            players.add(new Player(i, decks.get(i - 1), decks.get(i % n), winner, startGate, folder));
+            players.add(new Player(i, decks.get(i - 1), decks.get(i % n), winner, folder));
         }
 
         // Deal: give one card to each player in turn, four times round.
