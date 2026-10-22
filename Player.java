@@ -69,14 +69,31 @@ public class Player implements  Runnable{
         }
     }
 
+    // This must be an atomic action
+    public synchronized void DrawDiscard(int randInd){
+         String actionslog = "";
+        if (!LeftDeck.isEmpty()) {
+                RightDeck.addToBottom(hand[randInd]);
+                hand[randInd] = LeftDeck.drawFromTop();
+
+                actionslog += "Player " + playerid + " has added " + hand[randInd].getValue() + " to its hand " + "from deck " + LeftDeck.getId();
+
+        }else{
+                actionslog += "Player " + playerid+ " unable do draw a card due to deck not containing any cards";
+        }
+
+        addToLog(actionslog);
+        System.out.println(actionslog);
+    }
+
     @Override 
     public synchronized void run(){
         System.out.println("Player " + playerid + " has joined the game with the hand " + getHand());
         Random r = new Random();
         int randInd = r.nextInt(4);
+
         while(wincond.intValue() == 0){
-            
-            String actionslog = "";
+
             if(checkWin() && wincond.intValue() == 0){
                 Win();
                 continue;
@@ -88,18 +105,7 @@ public class Player implements  Runnable{
                 
             }while (hand[randInd].getValue() == playerid);
 
-            if (!LeftDeck.isEmpty()) {
-                RightDeck.addToBottom(hand[randInd]);
-                hand[randInd] = LeftDeck.drawFromTop();
-
-                actionslog += "Player " + playerid + " has added " + hand[randInd].getValue() + " to its hand " + getHand();
-
-            }else{
-                actionslog += "Unable do draw a card due to deck not containing any cards";
-            }
-
-            addToLog(actionslog);
-            System.out.println(actionslog);
+            DrawDiscard(randInd);
 
         }
         String winlog;
@@ -118,6 +124,7 @@ public class Player implements  Runnable{
             System.out.println("Unable to write log for player " + playerid);
         }
         
+        System.out.println("Player " + playerid + " exits");
     }
 }
 
