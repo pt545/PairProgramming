@@ -74,12 +74,12 @@ public class Player implements  Runnable{
          String actionslog = "";
         if (!LeftDeck.isEmpty()) {
                 RightDeck.addToBottom(hand[randInd]);
+                actionslog += "Player " + playerid + " has discarded " + hand[randInd].getValue() + " to deck " + RightDeck.getId() + "\n";
                 hand[randInd] = LeftDeck.drawFromTop();
-
                 actionslog += "Player " + playerid + " has added " + hand[randInd].getValue() + " to its hand " + "from deck " + LeftDeck.getId();
 
         }else{
-                actionslog += "Player " + playerid+ " unable do draw a card due to deck not containing any cards";
+                actionslog += "Player " + playerid+ " unable do draw a card due to deck " +LeftDeck.getId() +" not containing any cards";
         }
 
         addToLog(actionslog);
@@ -88,7 +88,10 @@ public class Player implements  Runnable{
 
     @Override 
     public synchronized void run(){
-        System.out.println("Player " + playerid + " has joined the game with the hand " + getHand());
+        String entry = "Player " + playerid + " has joined the game with the hand " + getHand();
+        System.out.println(entry);
+        addToLog(entry);
+
         Random r = new Random();
         int randInd = r.nextInt(4);
 
