@@ -31,6 +31,7 @@ public class Player implements  Runnable{
     }
 
 
+
     public synchronized void dealCard(Card card){
         hand[endIndex] = card;
         endIndex++;
@@ -45,7 +46,7 @@ public class Player implements  Runnable{
         wincond.set(playerid);
     }
 
-    public synchronized boolean checkWin(){
+    private synchronized boolean checkWin(){
         
         for(int i = 1; i < 4; i++){
             if (hand[i-1].getValue() != hand[i].getValue()) {
@@ -56,7 +57,7 @@ public class Player implements  Runnable{
     }
 
     public synchronized String getHand(){
-        String handstr = "[";
+        String handstr = "[ ";
         for(int i = 0; i < 4;i++){
             handstr +=  hand[i].getValue()+ " ";
         }
@@ -65,14 +66,14 @@ public class Player implements  Runnable{
         return handstr;
     }
 
-    public synchronized void writeLogtoFile() throws IOException{
+    private synchronized void writeLogtoFile() throws IOException{
         try (PrintWriter writer = new PrintWriter(Folder + "/player" + playerid + "_output.txt")) {
             writer.print(log);
         }
     }
 
     // This must be an atomic action
-    public synchronized void DrawDiscard(int randInd){
+    private synchronized void DrawDiscard(int randInd){
         String actionslog = "";
         if (!LeftDeck.isEmpty()) {
                 RightDeck.addToBottom(hand[randInd]);

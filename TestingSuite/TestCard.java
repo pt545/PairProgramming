@@ -9,7 +9,7 @@ import Main.Card;
 public class TestCard {
 
     @Test 
-    public void Test(){
+    public void TestGetValue(){
         Card card = new Card(1);
         assertEquals(card.getValue() , 1);
     }
