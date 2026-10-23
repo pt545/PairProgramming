@@ -1,3 +1,5 @@
+package Main;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Random;
@@ -71,7 +73,7 @@ public class Player implements  Runnable{
 
     // This must be an atomic action
     public synchronized void DrawDiscard(int randInd){
-         String actionslog = "";
+        String actionslog = "";
         if (!LeftDeck.isEmpty()) {
                 RightDeck.addToBottom(hand[randInd]);
                 actionslog += "Player " + playerid + " has discarded " + hand[randInd].getValue() + " to deck " + RightDeck.getId() + "\n";
