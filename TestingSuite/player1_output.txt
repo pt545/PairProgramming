@@ -1,2 +1,0 @@
-Player 1 has joined the game with the hand [ 1 1 1 1 ]
-Player 1 wins with the hand [ 1 1 1 1 ]

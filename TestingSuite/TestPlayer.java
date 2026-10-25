@@ -22,9 +22,7 @@ public class TestPlayer {
 
 
 
-    public TestPlayer(){
-        
-    }
+    String folder = "./TestingSuite/cardgame_output";
 
 
     public List<String> readFile(String filename) throws IOException{
@@ -61,7 +59,7 @@ public class TestPlayer {
             testdeck.addToBottom(new Card(1));
         }
 
-        Player testplayer = new Player(1,testdeck,testdeck,new AtomicInteger(0),"./TestingSuite/");
+        Player testplayer = new Player(1,testdeck,testdeck,new AtomicInteger(0),folder);
 
         Card[] testhand = {new Card(1),new Card(1),new Card(1),new Card(1)};
         for(int i = 0; i <4;i++){
@@ -69,7 +67,7 @@ public class TestPlayer {
         }
 
         testplayer.run();
-        File outputfile = new File("./TestingSuite/player1_output.txt");
+        File outputfile = new File(folder + "/player1_output.txt");
         assertTrue(outputfile.exists());
     }
 
@@ -81,7 +79,7 @@ public class TestPlayer {
             testdeck.addToBottom(new Card(1));
         }
 
-        Player testplayer = new Player(1,testdeck,testdeck,new AtomicInteger(0),"./TestingSuite/");
+        Player testplayer = new Player(1,testdeck,testdeck,new AtomicInteger(0),folder);
 
         Card[] testhand = {new Card(1),new Card(1),new Card(1),new Card(1)};
         for(int i = 0; i <4;i++){
@@ -94,7 +92,7 @@ public class TestPlayer {
 
         List<String> expectedoutput = new ArrayList<String>(){};
         try{
-            playeroutput = readFile( "./TestingSuite/player1_output.txt");
+            playeroutput = readFile( folder+"/player1_output.txt");
             expectedoutput = readFile("./TestingSuite/immidiatewinoutput.txt");
         }catch(IOException e){
             assertTrue(false);
@@ -114,7 +112,7 @@ public class TestPlayer {
             testdeck.addToBottom(new Card(2));
         }
 
-        Player testplayer = new Player(2,testdeck,testdeck,new AtomicInteger(0),"./TestingSuite/");
+        Player testplayer = new Player(2,testdeck,testdeck,new AtomicInteger(0),folder);
 
         Card[] testhand = {new Card(2),new Card(2),new Card(2),new Card(1)};
         for(int i = 0; i <4;i++){
@@ -126,7 +124,7 @@ public class TestPlayer {
         List<String> playeroutput = new ArrayList<String>(){};
 
         try{
-            playeroutput = readFile( "./TestingSuite/player2_output.txt");
+            playeroutput = readFile( folder + "/player2_output.txt");
         }catch(IOException e){
             assertTrue(false);
         }

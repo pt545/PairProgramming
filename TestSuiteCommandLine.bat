@@ -1,0 +1,1 @@
+java -jar ./lib/junit-platform-console-standalone-1.14.4.jar --class-path ./bin --select-package TestingSuite
